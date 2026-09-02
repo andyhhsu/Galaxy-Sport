@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Galaxy 揮汗有禮 - 星動抽獎</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Montserrat:ital,wght@1,800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(57, 255, 20, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(33, 137, 255, 0.15), transparent 25%);
+        }
+        .title-font {
+            font-family: 'Montserrat', sans-serif;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        /* --- 轉盤樣式 --- */
+        .wheel-container {
+            position: relative;
+            width: 90vw;
+            max-width: 380px;
+            height: 90vw;
+            max-height: 380px;
+            margin: 0 auto;
+            border-radius: 50%;
+            padding: 10px;
+            background: linear-gradient(135deg, #39FF14 0%, #0088FF 100%);
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.4), inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            background-color: #111;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #FF4500;
+            z-index: 20;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));
+        }
+        .wheel-center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 25%;
+            height: 25%;
+            background: #222;
+            border: 4px solid #fff;
+            border-radius: 50%;
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #fff;
+            font-size: 1.2rem;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
+        /* --- 輸入框與按鈕 --- */
+        .cyber-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(57, 255, 20, 0.5);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        .cyber-input:focus {
+            outline: none;
+            border-color: #39FF14;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .cyber-btn {
+            background: linear-gradient(90deg, #39FF14 0%, #22CC00 100%);
+            color: #000;
+            font-weight: 900;
+            text-transform: uppercase;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: all 0.2s ease;
+            border: none;
+            position: relative;
+        }
+        .cyber-btn:active {
+            transform: scale(0.95);
+        }
+        .cyber-btn:disabled {
+            background: #555;
+            color: #888;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        /* --- 彈跳視窗 --- */
+        .modal-overlay {
+            backdrop-filter: blur(8px);
+            background-color: rgba(0, 0, 0, 0.85);
+        }
+        .ticket-cutout {
+            background: #111;
+            border: 2px solid #39FF14;
+            position: relative;
+            mask-image: radial-gradient(circle at 0% 50%, transparent 10px, black 11px), radial-gradient(circle at 100% 50%, transparent 10px, black 11px);
+            mask-size: 51% 100%;
+            mask-repeat: no-repeat;
+            mask-position: left, right;
+            -webkit-mask-image: radial-gradient(circle at 0% 50%, transparent 10px, black 11px), radial-gradient(circle at 100% 50%, transparent 10px, black 11px);
+            -webkit-mask-size: 51% 100%;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: left, right;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative" onload="initApp()">
+
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#39FF14] via-[#0088FF] to-[#39FF14]"></div>
+    
+    <header class="w-full p-6 text-center z-10 mt-4">
+        <h2 class="title-font text-[#39FF14] text-xl font-black mb-1 tracking-widest">Galaxy</h2>
+        <h1 class="text-3xl md:text-4xl font-black tracking-wide text-white drop-shadow-md">揮汗有禮</h1>
+        <p class="text-gray-400 mt-2 text-sm">出示今日運動紀錄，幸運加碼抽！</p>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-start px-4 z-10 pb-12">
+        
+        <!-- 狀態提示標籤 (連線時隱藏) -->
+        <div id="demo-badge" class="bg-orange-500 text-white text-xs px-3 py-1 rounded-full mb-4 animate-pulse font-bold tracking-wider">
+            目前為：模擬連線模式 (尚未填入 API)
+        </div>
+
+        <div class="wheel-container mt-2">
+            <div class="wheel-pointer"></div>
+            <canvas id="wheelCanvas" class="wheel"></canvas>
+            <div class="wheel-center-dot">GO!</div>
+        </div>
+
+        <div class="w-full max-w-sm mt-10 space-y-4">
+            <div class="relative">
+                <input type="tel" id="phoneInput" placeholder="請輸入手機號碼 (09...)" maxlength="10" 
+                       class="cyber-input w-full p-4 pl-12 rounded-lg text-lg text-center tracking-widest placeholder-gray-500">
+                <svg class="w-6 h-6 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            </div>
+            
+            <button id="spinBtn" onclick="startSpin()" class="cyber-btn w-full py-4 text-xl shadow-[0_0_15px_rgba(57,255,20,0.5)] flex items-center justify-center">
+                <span>啟動抽獎</span>
+            </button>
+            <p class="text-xs text-center text-gray-500 mt-2">每支手機號碼限抽乙次</p>
+        </div>
+    </main>
+
+    <div id="resultModal" class="fixed inset-0 modal-overlay z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="ticket-cutout w-[85vw] max-w-sm p-8 text-center shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
+            <p class="text-[#39FF14] font-bold tracking-widest mb-2 text-sm uppercase">Congratulations</p>
+            <h3 class="text-2xl font-black mb-6 text-white">抽獎結果</h3>
+            
+            <div class="py-6 border-y border-dashed border-gray-700 my-4">
+                <p class="text-gray-400 text-sm mb-2">您獲得的獎項是</p>
+                <div id="prizeNameDisplay" class="text-3xl font-black text-[#39FF14] drop-shadow-[0_0_8px_rgba(57,255,20,0.6)] leading-tight">
+                    <!-- 獎品名稱 -->
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-300 mt-6 mb-6">請向門市人員出示此畫面<br>以完成兌換</p>
+            
+            <button onclick="closeModal()" class="w-full border border-gray-500 text-gray-300 py-3 rounded hover:bg-gray-800 transition uppercase text-sm font-bold tracking-widest">
+                確認
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // --- 抽獎系統設定 ---
+        // ==========================================
+        const API_URL = "https://script.google.com/macros/s/AKfycbxgNbp_PGLZrWLiWrMqkpcn3savo_0mmO7zhZ_fI8qoQRG2LlSDg46IJ0AegnMM5eDkaw/exec";
+        const isMockMode = API_URL.trim() === "";
+
+        // 將圖片上的獎項直接設定到前端，並搭配科技感配色
+        let prizes = [
+            { id: 1, name: "環保收納盒", color: "#39FF14", textColor: "#000" },      // 螢光綠
+            { id: 2, name: "手機擦拭布", color: "#2189FF", textColor: "#FFF" },      // 三星藍
+            { id: 3, name: "AI帆布袋", color: "#FF4500", textColor: "#FFF" },        // 活力橘
+            { id: 4, name: "木製杯墊", color: "#9333EA", textColor: "#FFF" },        // 科技紫
+            { id: 5, name: "行動電源", color: "#EAB308", textColor: "#000" },        // 閃耀黃
+            { id: 6, name: "吸管跳跳杯", color: "#EC4899", textColor: "#FFF" },      // 桃粉色
+            { id: 7, name: "放鬆筋膜槍", color: "#111111", textColor: "#FFF" }         // 質感黑
+        ];
+
+        let currentRotation = 0;
+
+        // --- 初始化與繪製轉盤 ---
+        async function initApp() {
+            if (!isMockMode) {
+                document.getElementById('demo-badge').style.display = 'none';
+                try {
+                    // 嘗試從 GAS 取得目前最新的獎項設定
+                    const response = await fetch(API_URL);
+                    const cloudPrizes = await response.json();
+                    
+                    // 如果成功從雲端取回資料且不為空，才覆寫本地的預設獎項
+                    // 如果雲端抓取失敗或被阻擋，就會繼續使用上方設定的 7 個預設獎項
+                    if (cloudPrizes && cloudPrizes.length > 0) {
+                        prizes = cloudPrizes;
+                    }
+                } catch (e) {
+                    console.error("無法連線至資料庫，將使用前端預設獎項顯示", e);
+                }
+            }
+            drawWheel();
+        }
+
+        function drawWheel() {
+            const canvas = document.getElementById('wheelCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 設定高解析度 Canvas，避免鋸齒
+            const size = canvas.parentElement.clientWidth;
+            canvas.width = size * 2;
+            canvas.height = size * 2;
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            
+            const radius = canvas.width / 2;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // 防護機制：萬一 prizes 為空，避免計算錯誤
+            if (!prizes || prizes.length === 0) return;
+            
+            const arcSize = (2 * Math.PI) / prizes.length;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < prizes.length; i++) {
+                const angle = i * arcSize;
+                
+                // 畫扇形
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, angle, angle + arcSize, false);
+                ctx.lineTo(centerX, centerY);
+                ctx.fillStyle = prizes[i].color || '#333'; // 確保有預設顏色
+                ctx.fill();
+                
+                // 畫邊界線
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = "#111";
+                ctx.stroke();
+
+                // 寫字
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle + arcSize / 2);
+                ctx.textAlign = "right";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = prizes[i].textColor || '#FFF';
+                ctx.font = "bold 40px 'Noto Sans TC'";
+                
+                if(ctx.fillStyle === "#FFF" || ctx.fillStyle === "#ffffff" || ctx.fillStyle === "rgb(255, 255, 255)") {
+                    ctx.shadowColor = "rgba(0,0,0,0.8)";
+                    ctx.shadowBlur = 5;
+                }
+                
+                let text = prizes[i].name || '';
+                if(text.length > 6) text = text.substring(0, 5) + '...';
+                
+                ctx.fillText(text, radius - 40, 0);
+                ctx.restore();
+            }
+        }
+
+        async function startSpin() {
+            const phoneInput = document.getElementById('phoneInput');
+            const spinBtn = document.getElementById('spinBtn');
+            const phone = phoneInput.value.trim();
+
+            if (!/^09\d{8}$/.test(phone)) {
+                alert('請輸入正確的 10 碼手機號碼 (09開頭)');
+                return;
+            }
+
+            phoneInput.disabled = true;
+            spinBtn.disabled = true;
+            spinBtn.innerHTML = '<span class="animate-pulse">連線驗證中...</span>';
+            spinBtn.style.opacity = '0.7';
+
+            let resultPrizeName = "";
+            let winningIndex = 0;
+
+            if (isMockMode) {
+                await new Promise(r => setTimeout(r, 800));
+                winningIndex = Math.floor(Math.random() * prizes.length);
+                resultPrizeName = prizes[winningIndex].name;
+            } else {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ phone: phone, action: 'draw' }),
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if(data.status === 'error') {
+                        alert(data.message || "發生錯誤，請洽門市人員。");
+                        resetUI();
+                        return;
+                    }
+
+                    resultPrizeName = data.prize;
+                    winningIndex = prizes.findIndex(p => p.name === resultPrizeName);
+                    
+                    if(winningIndex === -1) winningIndex = 0; 
+
+                } catch (error) {
+                    console.error(error);
+                    alert('連線失敗，請確認網路狀態或洽門市人員。');
+                    resetUI();
+                    return;
+                }
+            }
+
+            spinBtn.innerHTML = '<span>抽獎進行中...</span>';
+            
+            const canvas = document.getElementById('wheelCanvas');
+            const arcSize = 360 / prizes.length;
+            
+            const targetAngle = 270 - (winningIndex * arcSize) - (arcSize / 2); 
+            const extraSpins = 360 * (5 + Math.floor(Math.random() * 5)); 
+            
+            currentRotation = currentRotation + extraSpins + targetAngle - (currentRotation % 360);
+            
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                showResult(resultPrizeName);
+            }, 5200); 
+        }
+
+        function showResult(prizeName) {
+            document.getElementById('prizeNameDisplay').innerText = prizeName;
+            const modal = document.getElementById('resultModal');
+            const content = document.getElementById('modalContent');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 50);
+
+            document.getElementById('spinBtn').innerHTML = '<span>已完成抽獎</span>';
+        }
+
+        function closeModal() {
+            alert("請將此畫面交由門市人員核銷！");
+        }
+
+        function resetUI() {
+            const phoneInput = document.getElementById('phoneInput');
+            const spinBtn = document.getElementById('spinBtn');
+            phoneInput.disabled = false;
+            spinBtn.disabled = false;
+            spinBtn.style.opacity = '1';
+            spinBtn.innerHTML = '<span>啟動抽獎</span>';
+        }
+    </script>
+</body>
+</html>
