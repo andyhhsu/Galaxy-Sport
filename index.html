@@ -59,7 +59,9 @@
             background-color: #060910;
             color: #F8FAFC;
             min-height: 100vh;
-            overflow-x: hidden;
+            min-height: 100dvh;
+            height: 100dvh;
+            overflow: hidden;
             background-image: 
                 radial-gradient(circle at 50% 0%, rgba(20, 70, 255, 0.28) 0%, transparent 55%),
                 radial-gradient(circle at 10% 40%, rgba(0, 255, 135, 0.12) 0%, transparent 40%),
@@ -74,36 +76,35 @@
             letter-spacing: 0.5px;
         }
 
-        /* --- 旗艦 Galaxy 腕錶風格轉盤容器 --- */
+        /* --- 旗艦 Galaxy 腕錶風格轉盤容器 (放大尺寸並兼顧一屏無滾動) --- */
         .wheel-outer-chassis {
             position: relative;
-            width: 88vw;
-            max-width: 375px;
-            height: 88vw;
-            max-height: 375px;
+            /* 大幅提升輪盤比例，作為視覺核心主體 */
+            width: min(86vw, 43vh, 330px);
+            height: min(86vw, 43vh, 330px);
             margin: 0 auto;
             border-radius: 50%;
-            padding: 12px;
+            padding: 9px;
             /* 模擬 Galaxy Watch Ultra 鈦合金立體外框 */
             background: linear-gradient(135deg, #2A364F 0%, #0F172A 50%, #1A2438 100%);
             box-shadow: 
-                0 0 0 1px rgba(255, 255, 255, 0.15),
-                0 18px 45px -10px rgba(0, 0, 0, 0.9),
-                0 0 35px rgba(0, 255, 135, 0.2),
-                inset 0 2px 4px rgba(255, 255, 255, 0.25),
-                inset 0 -3px 8px rgba(0, 0, 0, 0.8);
+                0 0 0 1px rgba(255, 255, 255, 0.18),
+                0 16px 40px -8px rgba(0, 0, 0, 0.92),
+                0 0 30px rgba(0, 255, 135, 0.22),
+                inset 0 2px 5px rgba(255, 255, 255, 0.28),
+                inset 0 -3px 8px rgba(0, 0, 0, 0.85);
         }
 
         /* 外部 LED 刻度環光暈 */
         .wheel-outer-chassis::before {
             content: '';
             position: absolute;
-            inset: -4px;
+            inset: -3px;
             border-radius: 50%;
             background: conic-gradient(from 0deg, #00FF87, #00F2FE, #1446FF, #FF5722, #00FF87);
             z-index: -1;
             opacity: 0.7;
-            filter: blur(8px);
+            filter: blur(6px);
             animation: spin-slow 22s linear infinite;
         }
 
@@ -114,7 +115,7 @@
             height: 100%;
             border-radius: 50%;
             overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.85);
+            box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.85);
             background: #0B111E;
         }
 
@@ -127,50 +128,50 @@
             will-change: transform;
         }
 
-        /* --- 頂級立體指針 --- */
+        /* --- 頂級立體指針 (配合精巧尺寸縮放) --- */
         .wheel-pointer-assembly {
             position: absolute;
-            top: -14px;
+            top: -12px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 30;
             display: flex;
             flex-direction: column;
             align-items: center;
-            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
             pointer-events: none;
         }
 
         .pointer-gem {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             background: radial-gradient(circle, #FFF 15%, #00FF87 70%, #059669 100%);
             border: 2px solid #FFF;
             box-shadow: 0 0 12px #00FF87;
-            margin-bottom: -5px;
+            margin-bottom: -4px;
             z-index: 2;
         }
 
         .pointer-arrow {
             width: 0;
             height: 0;
-            border-left: 14px solid transparent;
-            border-right: 14px solid transparent;
-            border-top: 32px solid #00FF87;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 26px solid #00FF87;
             position: relative;
         }
 
         .pointer-arrow::after {
             content: '';
             position: absolute;
-            top: -30px;
-            left: -8px;
+            top: -25px;
+            left: -7px;
             width: 0;
             height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 20px solid #FFFFFF;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 16px solid #FFFFFF;
         }
 
         /* --- 轉盤核心 GO 觸發鈕 --- */
@@ -183,10 +184,10 @@
             height: 24%;
             border-radius: 50%;
             background: radial-gradient(circle at 35% 30%, #2A364F, #080C14 85%);
-            border: 3px solid rgba(255, 255, 255, 0.8);
+            border: 2.5px solid rgba(255, 255, 255, 0.85);
             box-shadow: 
-                0 0 20px rgba(0, 0, 0, 0.9),
-                0 0 15px rgba(0, 242, 254, 0.4),
+                0 0 16px rgba(0, 0, 0, 0.9),
+                0 0 12px rgba(0, 242, 254, 0.4),
                 inset 0 2px 4px rgba(255, 255, 255, 0.4);
             z-index: 25;
             display: flex;
@@ -270,57 +271,52 @@
         .ticket-notch::after { right: -11px; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen text-slate-100 selection:bg-emerald-500 selection:text-black" onload="initApp()">
+<body class="flex flex-col h-[100dvh] max-h-[100dvh] overflow-hidden text-slate-100 selection:bg-emerald-500 selection:text-black justify-between" onload="initApp()">
 
     <!-- 頂端微光跑道條 -->
-    <div class="w-full h-1 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-600 shadow-[0_0_12px_rgba(0,255,135,0.8)]"></div>
+    <div class="w-full h-1 shrink-0 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-600 shadow-[0_0_12px_rgba(0,255,135,0.8)]"></div>
 
-    <!-- 頁面頂部品牌標題 -->
-    <header class="w-full pt-6 pb-4 px-4 text-center z-10 flex flex-col items-center relative">
-        <!-- 音效靜音切換按鈕 (便於門市現場控制) -->
+    <!-- 頁面頂部品牌標題 (緊湊佈局，釋放垂直高度給轉盤) -->
+    <header class="w-full pt-1.5 pb-0.5 px-4 text-center z-10 flex flex-col items-center relative shrink-0">
+        <!-- 音效靜音切換按鈕 -->
         <button 
             id="soundToggleBtn" 
             onclick="toggleAudio()" 
-            class="absolute right-4 top-5 p-2 rounded-full bg-slate-800/80 border border-slate-700/80 text-slate-300 hover:text-emerald-400 hover:border-emerald-400/50 transition-all text-xs flex items-center gap-1 shadow-md"
+            class="absolute right-3.5 top-2 p-1.5 rounded-full bg-slate-800/80 border border-slate-700/80 text-slate-300 hover:text-emerald-400 hover:border-emerald-400/50 transition-all text-xs flex items-center gap-1 shadow-md"
             title="音效開關"
         >
-            <span id="soundIcon" class="w-4 h-4 flex items-center justify-center">🔊</span>
+            <span id="soundIcon" class="w-3.5 h-3.5 flex items-center justify-center text-xs">🔊</span>
         </button>
 
-        <!-- 頂部膠囊徽章 -->
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/80 text-xs font-semibold text-slate-300 mb-2 shadow-inner">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span class="tracking-widest uppercase text-[11px] text-emerald-400 font-bold">Health & Energy</span>
-            <span class="text-slate-500">|</span>
-            <span>門市專屬加碼</span>
-        </div>
-
-        <!-- 主標題：保持 Galaxy 大小寫 -->
-        <div class="flex items-center justify-center gap-2 mt-1">
-            <span class="title-sport text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-300 to-blue-400">
+        <!-- 主標題與標籤整合成緊湊排版 -->
+        <div class="flex items-center justify-center gap-1.5 mt-0.5">
+            <span class="title-sport text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-300 to-blue-400">
                 Galaxy
             </span>
-            <h1 class="text-2xl md:text-3xl font-black tracking-wider text-white">
+            <h1 class="text-xl sm:text-2xl font-black tracking-wider text-white">
                 揮汗有禮
             </h1>
+            <span class="ml-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold">
+                門市限定
+            </span>
         </div>
         
-        <p class="text-xs md:text-sm text-slate-400 mt-1 max-w-xs leading-relaxed">
-            出示今日運動步數紀錄 · 即刻解鎖幸運輪盤
+        <p class="text-[11px] text-slate-400 mt-0.5">
+            出示今日運動步數紀錄 · 解鎖星動幸運轉盤
         </p>
     </header>
 
-    <!-- 主要內容區 -->
-    <main class="flex-grow flex flex-col items-center justify-start px-4 z-10 pb-10 w-full max-w-md mx-auto">
+    <!-- 主要內容區 (大轉盤居中 + 高效底部輸入卡片) -->
+    <main class="flex-1 flex flex-col items-center justify-center px-3 z-10 w-full max-w-sm mx-auto overflow-hidden py-0.5 gap-1.5">
         
         <!-- 連線狀態提示 (僅在未設定 API 時展示) -->
-        <div id="demo-badge" class="bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs px-3.5 py-1 rounded-full mb-3 flex items-center gap-2 font-medium">
+        <div id="demo-badge" class="bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] px-2.5 py-0.5 rounded-full flex items-center gap-1.5 font-medium shrink-0">
             <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-            <span>離線展示模式 (填入 API 後將自動隱藏)</span>
+            <span>離線展示模式</span>
         </div>
 
-        <!-- 腕錶外觀的輪盤容器 -->
-        <div class="wheel-outer-chassis mt-1">
+        <!-- 腕錶外觀的大輪盤容器 -->
+        <div class="wheel-outer-chassis my-auto shrink-0">
             <!-- 精緻指針 -->
             <div class="wheel-pointer-assembly">
                 <div class="pointer-gem"></div>
@@ -333,60 +329,49 @@
                 
                 <!-- 中心按鈕 -->
                 <div class="wheel-hub-btn" onclick="startSpin()" title="點擊啟動">
-                    <span class="title-sport font-black text-sm md:text-base text-white tracking-wider">GO</span>
-                    <span class="text-[9px] text-cyan-300 -mt-0.5 tracking-tighter">SPIN</span>
+                    <span class="title-sport font-black text-xs sm:text-sm text-white tracking-wider">GO</span>
+                    <span class="text-[8px] text-cyan-300 -mt-0.5 tracking-tighter">SPIN</span>
                 </div>
             </div>
         </div>
 
-        <!-- 輸入與操作卡片 -->
-        <div class="w-full mt-7 glass-panel p-5 rounded-2xl glow-border">
-            <div class="flex items-center justify-between mb-3 px-1">
-                <label for="phoneInput" class="text-xs font-bold text-slate-300 tracking-wider flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                    </svg>
-                    參與者手機號碼
-                </label>
-                <span class="text-[11px] text-slate-400 font-mono">1次 / 門市限抽</span>
-            </div>
-
-            <div class="relative">
-                <input 
-                    type="tel" 
-                    id="phoneInput" 
-                    placeholder="請輸入 10 碼手機號碼 (09...)" 
-                    maxlength="10" 
-                    inputmode="numeric"
-                    class="w-full bg-slate-900/90 border border-slate-700 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30 rounded-xl py-3.5 px-4 text-center text-lg font-mono tracking-widest text-white placeholder-slate-500 transition-all outline-none"
+        <!-- 輸入與操作卡片 (水平整合型，高度極低不擠壓輪盤) -->
+        <div class="w-full glass-panel p-2.5 rounded-2xl glow-border shrink-0 shadow-lg">
+            <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                    <input 
+                        type="tel" 
+                        id="phoneInput" 
+                        placeholder="請輸入手機號碼 (09...)" 
+                        maxlength="10" 
+                        inputmode="numeric"
+                        class="w-full bg-slate-900/90 border border-slate-700 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/40 rounded-xl py-2 px-3 text-center text-sm font-mono tracking-wider text-white placeholder-slate-500 transition-all outline-none"
+                    >
+                </div>
+                <!-- 啟動按鈕 -->
+                <button 
+                    id="spinBtn" 
+                    onclick="startSpin()" 
+                    class="action-gradient-btn px-4 py-2 rounded-xl text-sm tracking-wider flex items-center justify-center gap-1 shrink-0 shadow-[0_4px_12px_rgba(0,255,135,0.25)]"
                 >
+                    <svg class="w-3.5 h-3.5 text-slate-950" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+                    </svg>
+                    <span id="spinBtnText">立即抽獎</span>
+                </button>
             </div>
 
-            <!-- 啟動按鈕 -->
-            <button 
-                id="spinBtn" 
-                onclick="startSpin()" 
-                class="action-gradient-btn w-full py-4 mt-4 rounded-xl text-base tracking-wider flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(0,255,135,0.25)]"
-            >
-                <svg class="w-5 h-5 text-slate-950" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
-                </svg>
-                <span id="spinBtnText">啟動星動轉盤</span>
-            </button>
-
-            <p class="text-[11px] text-center text-slate-400 mt-3 flex items-center justify-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-cyan-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                中獎後請出示完成畫面予門市人員核銷
-            </p>
+            <div class="flex items-center justify-between text-[10px] text-slate-400 mt-1 px-1">
+                <span>1次/門市限抽</span>
+                <span class="text-cyan-300">中獎後請出示畫面予人員核銷</span>
+            </div>
         </div>
-
-        <!-- 門市資訊標籤 -->
-        <footer class="mt-6 text-center text-xs text-slate-400 space-y-1">
-            <p>微風南山旗艦體驗館 · 揮汗加碼專案</p>
-        </footer>
     </main>
+
+    <!-- 門市資訊標籤 (精巧底欄) -->
+    <footer class="pb-1.5 pt-0 text-center text-[10px] text-slate-400 shrink-0">
+        <p>微風南山旗艦體驗館 · 揮汗加碼專案</p>
+    </footer>
 
     <!-- 中獎兌換彈跳視窗 -->
     <div id="resultModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
@@ -635,17 +620,21 @@
                     console.warn("使用本地精緻配色繪製轉盤：", e);
                 }
             }
+            // 確保字型就緒後立即繪製
+            if (document.fonts) {
+                document.fonts.ready.then(() => drawHighTechWheel());
+            }
             drawHighTechWheel();
         }
 
-        // --- 繪製運動科技感轉盤 ---
+        // --- 繪製運動科技感轉盤 (字體排版無截斷、清晰大器) ---
         function drawHighTechWheel() {
             const canvas = document.getElementById('wheelCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             
-            // 視網膜高清晰度縮放 (Retina Display)
-            const parentWidth = canvas.parentElement.clientWidth;
+            // 視網膜高清晰度縮放 (Retina Display)，加強尺寸相容性
+            const parentWidth = canvas.parentElement.clientWidth || canvas.parentElement.getBoundingClientRect().width || 300;
             const dpr = window.devicePixelRatio || 2;
             canvas.width = parentWidth * dpr;
             canvas.height = parentWidth * dpr;
@@ -673,7 +662,7 @@
 
                 // 徑向金屬與微光漸層
                 const radGrad = ctx.createRadialGradient(
-                    centerX, centerY, radius * 0.2,
+                    centerX, centerY, radius * 0.22,
                     centerX, centerY, radius
                 );
                 radGrad.addColorStop(0, prizes[i].color || '#1e293b');
@@ -683,26 +672,26 @@
                 ctx.fill();
 
                 // 2. 扇形邊界光條
-                ctx.lineWidth = 3 * (dpr / 2);
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+                ctx.lineWidth = 2 * (dpr / 2);
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
                 ctx.stroke();
                 ctx.restore();
 
-                // 3. 繪製精緻外圍 LED 點點
+                // 3. 繪製外圍 LED 點點
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle + arcSize / 2);
 
-                const dotDistance = radius - (14 * (dpr / 2));
+                const dotDistance = radius - (12 * (dpr / 2));
                 ctx.beginPath();
-                ctx.arc(dotDistance, 0, 3 * (dpr / 2), 0, Math.PI * 2);
-                ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+                ctx.arc(dotDistance, 0, 2.5 * (dpr / 2), 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
                 ctx.shadowColor = "#00FF87";
                 ctx.shadowBlur = 6;
                 ctx.fill();
                 ctx.restore();
 
-                // 4. 文字排版
+                // 4. 文字排版 (品名完整呈現、粗體清晰)
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle + arcSize / 2);
@@ -710,23 +699,18 @@
                 ctx.textBaseline = "middle";
                 ctx.fillStyle = prizes[i].textColor || "#FFFFFF";
                 
-                // 根據畫面動態適配文字尺寸
-                const fontSize = Math.max(22, Math.floor(26 * (dpr / 2)));
-                ctx.font = `900 ${fontSize}px 'Noto Sans TC', sans-serif`;
+                // 根據半徑動態計算最清晰字體
+                const fontSize = Math.max(22, Math.floor(radius * 0.088));
+                ctx.font = `900 ${fontSize}px 'Noto Sans TC', -apple-system, sans-serif`;
                 
-                // 陰影增加科技對比
-                ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
-                ctx.shadowBlur = 8;
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
+                // 強化陰影確保任何背景色皆清晰好讀
+                ctx.shadowColor = "rgba(0, 0, 0, 0.95)";
+                ctx.shadowBlur = 6;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
                 
-                let text = prizes[i].name || '';
-                if (text.length > 6) {
-                    text = text.substring(0, 5) + '..';
-                }
-                
-                // 文字位置保留邊距
-                const textMargin = 38 * (dpr / 2);
+                const text = prizes[i].name || '';
+                const textMargin = 22 * (dpr / 2);
                 ctx.fillText(text, radius - textMargin, 0);
                 ctx.restore();
             }
@@ -734,9 +718,9 @@
             // 5. 轉盤最外圈內陰影環
             ctx.save();
             ctx.beginPath();
-            ctx.arc(centerX, centerY, radius - (4 * (dpr / 2)), 0, Math.PI * 2);
-            ctx.strokeStyle = "rgba(0, 242, 254, 0.35)";
-            ctx.lineWidth = 4 * (dpr / 2);
+            ctx.arc(centerX, centerY, radius - (3 * (dpr / 2)), 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(0, 242, 254, 0.4)";
+            ctx.lineWidth = 3 * (dpr / 2);
             ctx.stroke();
             ctx.restore();
         }
