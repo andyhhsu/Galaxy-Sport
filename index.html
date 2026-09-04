@@ -2,249 +2,661 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Galaxy 揮汗有禮 - 星動抽獎</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Montserrat:ital,wght@1,800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        galaxy: {
+                            blue: '#1446FF',
+                            cyan: '#00F2FE',
+                            neon: '#00FF87',
+                            orange: '#FF5722',
+                            dark: '#080C14',
+                            surface: '#0F172A',
+                            border: 'rgba(255, 255, 255, 0.12)'
+                        }
+                    },
+                    animation: {
+                        'glow-pulse': 'glowPulse 2.5s infinite ease-in-out',
+                        'float-soft': 'floatSoft 3s ease-in-out infinite',
+                        'spin-slow': 'spin 20s linear infinite'
+                    },
+                    keyframes: {
+                        glowPulse: {
+                            '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                            '50%': { opacity: '0.85', transform: 'scale(1.03)' }
+                        },
+                        floatSoft: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-6px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;0,900;1,800;1,900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti for Celebration Effect -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Tone.js for Native High-Tech Sound Synthesis -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
     <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
         body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #000;
-            color: #fff;
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #060910;
+            color: #F8FAFC;
+            min-height: 100vh;
             overflow-x: hidden;
             background-image: 
-                radial-gradient(circle at 15% 50%, rgba(57, 255, 20, 0.15), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(33, 137, 255, 0.15), transparent 25%);
+                radial-gradient(circle at 50% 0%, rgba(20, 70, 255, 0.28) 0%, transparent 55%),
+                radial-gradient(circle at 10% 40%, rgba(0, 255, 135, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 90% 60%, rgba(0, 242, 254, 0.14) 0%, transparent 45%),
+                linear-gradient(180deg, #050811 0%, #080C16 100%);
+            background-attachment: fixed;
         }
-        .title-font {
+
+        .title-sport {
             font-family: 'Montserrat', sans-serif;
             font-style: italic;
-            /* 移除了 text-transform: uppercase; 確保 Galaxy 可以正確顯示大小寫 */
-            letter-spacing: 2px;
+            letter-spacing: 0.5px;
         }
-        /* --- 轉盤樣式 --- */
-        .wheel-container {
+
+        /* --- 旗艦 Galaxy 腕錶風格轉盤容器 --- */
+        .wheel-outer-chassis {
             position: relative;
-            width: 90vw;
-            max-width: 380px;
-            height: 90vw;
-            max-height: 380px;
+            width: 88vw;
+            max-width: 375px;
+            height: 88vw;
+            max-height: 375px;
             margin: 0 auto;
             border-radius: 50%;
-            padding: 10px;
-            background: linear-gradient(135deg, #39FF14 0%, #0088FF 100%);
-            box-shadow: 0 0 30px rgba(57, 255, 20, 0.4), inset 0 0 20px rgba(0,0,0,0.8);
+            padding: 12px;
+            /* 模擬 Galaxy Watch Ultra 鈦合金立體外框 */
+            background: linear-gradient(135deg, #2A364F 0%, #0F172A 50%, #1A2438 100%);
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.15),
+                0 18px 45px -10px rgba(0, 0, 0, 0.9),
+                0 0 35px rgba(0, 255, 135, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.25),
+                inset 0 -3px 8px rgba(0, 0, 0, 0.8);
         }
-        .wheel {
+
+        /* 外部 LED 刻度環光暈 */
+        .wheel-outer-chassis::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #00FF87, #00F2FE, #1446FF, #FF5722, #00FF87);
+            z-index: -1;
+            opacity: 0.7;
+            filter: blur(8px);
+            animation: spin-slow 22s linear infinite;
+        }
+
+        /* 輪盤內部旋轉主體 */
+        .wheel-core-wrap {
+            position: relative;
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            position: relative;
             overflow: hidden;
-            transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-            background-color: #111;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.85);
+            background: #0B111E;
         }
-        .wheel-pointer {
+
+        .wheel-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: block;
+            transition: transform 5.4s cubic-bezier(0.12, 0.85, 0.18, 1);
+            will-change: transform;
+        }
+
+        /* --- 頂級立體指針 --- */
+        .wheel-pointer-assembly {
             position: absolute;
-            top: -15px;
+            top: -14px;
             left: 50%;
             transform: translateX(-50%);
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+            pointer-events: none;
+        }
+
+        .pointer-gem {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #FFF 15%, #00FF87 70%, #059669 100%);
+            border: 2px solid #FFF;
+            box-shadow: 0 0 12px #00FF87;
+            margin-bottom: -5px;
+            z-index: 2;
+        }
+
+        .pointer-arrow {
             width: 0;
             height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 40px solid #FF4500;
-            z-index: 20;
-            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 32px solid #00FF87;
+            position: relative;
         }
-        .wheel-center-dot {
+
+        .pointer-arrow::after {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: -8px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 20px solid #FFFFFF;
+        }
+
+        /* --- 轉盤核心 GO 觸發鈕 --- */
+        .wheel-hub-btn {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 25%;
-            height: 25%;
-            background: #222;
-            border: 4px solid #fff;
+            width: 24%;
+            height: 24%;
             border-radius: 50%;
-            z-index: 15;
+            background: radial-gradient(circle at 35% 30%, #2A364F, #080C14 85%);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 
+                0 0 20px rgba(0, 0, 0, 0.9),
+                0 0 15px rgba(0, 242, 254, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.4);
+            z-index: 25;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-weight: 900;
-            color: #fff;
-            font-size: 1.2rem;
-            box-shadow: 0 0 15px rgba(0,0,0,0.8);
-        }
-        /* --- 輸入框與按鈕 --- */
-        .cyber-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(57, 255, 20, 0.5);
-            color: #fff;
-            transition: all 0.3s ease;
-        }
-        .cyber-input:focus {
-            outline: none;
-            border-color: #39FF14;
-            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-        }
-        .cyber-btn {
-            background: linear-gradient(90deg, #39FF14 0%, #22CC00 100%);
-            color: #000;
-            font-weight: 900;
-            text-transform: uppercase;
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            cursor: pointer;
+            user-select: none;
             transition: all 0.2s ease;
-            border: none;
+        }
+
+        .wheel-hub-btn:active {
+            transform: translate(-50%, -50%) scale(0.94);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.8);
+        }
+
+        /* 運動感光澤按鈕 */
+        .action-gradient-btn {
+            background: linear-gradient(100deg, #00FF87 0%, #00F2FE 100%);
+            color: #060910;
+            font-weight: 900;
             position: relative;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .cyber-btn:active {
-            transform: scale(0.95);
+        .action-gradient-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: skewX(-20deg);
+            transition: 0.6s;
         }
-        .cyber-btn:disabled {
-            background: #555;
-            color: #888;
+        .action-gradient-btn:hover::after {
+            left: 140%;
+        }
+        .action-gradient-btn:active {
+            transform: scale(0.98);
+        }
+        .action-gradient-btn:disabled {
+            background: #1E293B;
+            color: #64748B;
             cursor: not-allowed;
+            transform: none;
             box-shadow: none;
         }
-        /* --- 彈跳視窗 --- */
-        .modal-overlay {
-            backdrop-filter: blur(8px);
-            background-color: rgba(0, 0, 0, 0.85);
+
+        /* 科技感玻璃擬態 */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .ticket-cutout {
-            background: #111;
-            border: 2px solid #39FF14;
+
+        .glow-border {
+            border: 1px solid rgba(0, 255, 135, 0.4);
+            box-shadow: 0 0 15px rgba(0, 255, 135, 0.15);
+        }
+
+        /* 兌換券卡片邊緣凹槽效果 */
+        .ticket-notch {
             position: relative;
-            mask-image: radial-gradient(circle at 0% 50%, transparent 10px, black 11px), radial-gradient(circle at 100% 50%, transparent 10px, black 11px);
-            mask-size: 51% 100%;
-            mask-repeat: no-repeat;
-            mask-position: left, right;
-            -webkit-mask-image: radial-gradient(circle at 0% 50%, transparent 10px, black 11px), radial-gradient(circle at 100% 50%, transparent 10px, black 11px);
-            -webkit-mask-size: 51% 100%;
-            -webkit-mask-repeat: no-repeat;
-            -webkit-mask-position: left, right;
+            background: #0B1120;
+            border: 1px solid rgba(0, 255, 135, 0.4);
         }
+        .ticket-notch::before, .ticket-notch::after {
+            content: '';
+            position: absolute;
+            top: 58%;
+            width: 20px;
+            height: 20px;
+            background: #060910;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        .ticket-notch::before { left: -11px; }
+        .ticket-notch::after { right: -11px; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col relative" onload="initApp()">
+<body class="flex flex-col min-h-screen text-slate-100 selection:bg-emerald-500 selection:text-black" onload="initApp()">
 
-    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#39FF14] via-[#0088FF] to-[#39FF14]"></div>
-    
-    <header class="w-full p-6 text-center z-10 mt-4">
-        <h2 class="title-font text-[#39FF14] text-xl font-black mb-1 tracking-widest">Galaxy</h2>
-        <h1 class="text-3xl md:text-4xl font-black tracking-wide text-white drop-shadow-md">揮汗有禮</h1>
-        <p class="text-gray-400 mt-2 text-sm">出示今日運動紀錄，幸運加碼抽！</p>
+    <!-- 頂端微光跑道條 -->
+    <div class="w-full h-1 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-600 shadow-[0_0_12px_rgba(0,255,135,0.8)]"></div>
+
+    <!-- 頁面頂部品牌標題 -->
+    <header class="w-full pt-6 pb-4 px-4 text-center z-10 flex flex-col items-center relative">
+        <!-- 音效靜音切換按鈕 (便於門市現場控制) -->
+        <button 
+            id="soundToggleBtn" 
+            onclick="toggleAudio()" 
+            class="absolute right-4 top-5 p-2 rounded-full bg-slate-800/80 border border-slate-700/80 text-slate-300 hover:text-emerald-400 hover:border-emerald-400/50 transition-all text-xs flex items-center gap-1 shadow-md"
+            title="音效開關"
+        >
+            <span id="soundIcon" class="w-4 h-4 flex items-center justify-center">🔊</span>
+        </button>
+
+        <!-- 頂部膠囊徽章 -->
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/80 text-xs font-semibold text-slate-300 mb-2 shadow-inner">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span class="tracking-widest uppercase text-[11px] text-emerald-400 font-bold">Health & Energy</span>
+            <span class="text-slate-500">|</span>
+            <span>門市專屬加碼</span>
+        </div>
+
+        <!-- 主標題：保持 Galaxy 大小寫 -->
+        <div class="flex items-center justify-center gap-2 mt-1">
+            <span class="title-sport text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-300 to-blue-400">
+                Galaxy
+            </span>
+            <h1 class="text-2xl md:text-3xl font-black tracking-wider text-white">
+                揮汗有禮
+            </h1>
+        </div>
+        
+        <p class="text-xs md:text-sm text-slate-400 mt-1 max-w-xs leading-relaxed">
+            出示今日運動步數紀錄 · 即刻解鎖幸運輪盤
+        </p>
     </header>
 
-    <main class="flex-grow flex flex-col items-center justify-start px-4 z-10 pb-12">
+    <!-- 主要內容區 -->
+    <main class="flex-grow flex flex-col items-center justify-start px-4 z-10 pb-10 w-full max-w-md mx-auto">
         
-        <!-- 狀態提示標籤 (連線時隱藏) -->
-        <div id="demo-badge" class="bg-orange-500 text-white text-xs px-3 py-1 rounded-full mb-4 animate-pulse font-bold tracking-wider">
-            目前為：模擬連線模式 (尚未填入 API)
+        <!-- 連線狀態提示 (僅在未設定 API 時展示) -->
+        <div id="demo-badge" class="bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs px-3.5 py-1 rounded-full mb-3 flex items-center gap-2 font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            <span>離線展示模式 (填入 API 後將自動隱藏)</span>
         </div>
 
-        <div class="wheel-container mt-2">
-            <div class="wheel-pointer"></div>
-            <canvas id="wheelCanvas" class="wheel"></canvas>
-            <div class="wheel-center-dot">GO!</div>
-        </div>
-
-        <div class="w-full max-w-sm mt-10 space-y-4">
-            <div class="relative">
-                <input type="tel" id="phoneInput" placeholder="請輸入手機號碼 (09...)" maxlength="10" 
-                       class="cyber-input w-full p-4 pl-12 rounded-lg text-lg text-center tracking-widest placeholder-gray-500">
-                <svg class="w-6 h-6 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+        <!-- 腕錶外觀的輪盤容器 -->
+        <div class="wheel-outer-chassis mt-1">
+            <!-- 精緻指針 -->
+            <div class="wheel-pointer-assembly">
+                <div class="pointer-gem"></div>
+                <div class="pointer-arrow"></div>
             </div>
-            
-            <button id="spinBtn" onclick="startSpin()" class="cyber-btn w-full py-4 text-xl shadow-[0_0_15px_rgba(57,255,20,0.5)] flex items-center justify-center">
-                <span>啟動抽獎</span>
-            </button>
-            <p class="text-xs text-center text-gray-500 mt-2">每支手機號碼限抽乙次</p>
+
+            <!-- 輪盤主體 -->
+            <div class="wheel-core-wrap">
+                <canvas id="wheelCanvas" class="wheel-canvas"></canvas>
+                
+                <!-- 中心按鈕 -->
+                <div class="wheel-hub-btn" onclick="startSpin()" title="點擊啟動">
+                    <span class="title-sport font-black text-sm md:text-base text-white tracking-wider">GO</span>
+                    <span class="text-[9px] text-cyan-300 -mt-0.5 tracking-tighter">SPIN</span>
+                </div>
+            </div>
         </div>
+
+        <!-- 輸入與操作卡片 -->
+        <div class="w-full mt-7 glass-panel p-5 rounded-2xl glow-border">
+            <div class="flex items-center justify-between mb-3 px-1">
+                <label for="phoneInput" class="text-xs font-bold text-slate-300 tracking-wider flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                    參與者手機號碼
+                </label>
+                <span class="text-[11px] text-slate-400 font-mono">1次 / 門市限抽</span>
+            </div>
+
+            <div class="relative">
+                <input 
+                    type="tel" 
+                    id="phoneInput" 
+                    placeholder="請輸入 10 碼手機號碼 (09...)" 
+                    maxlength="10" 
+                    inputmode="numeric"
+                    class="w-full bg-slate-900/90 border border-slate-700 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30 rounded-xl py-3.5 px-4 text-center text-lg font-mono tracking-widest text-white placeholder-slate-500 transition-all outline-none"
+                >
+            </div>
+
+            <!-- 啟動按鈕 -->
+            <button 
+                id="spinBtn" 
+                onclick="startSpin()" 
+                class="action-gradient-btn w-full py-4 mt-4 rounded-xl text-base tracking-wider flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(0,255,135,0.25)]"
+            >
+                <svg class="w-5 h-5 text-slate-950" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+                </svg>
+                <span id="spinBtnText">啟動星動轉盤</span>
+            </button>
+
+            <p class="text-[11px] text-center text-slate-400 mt-3 flex items-center justify-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-cyan-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                中獎後請出示完成畫面予門市人員核銷
+            </p>
+        </div>
+
+        <!-- 門市資訊標籤 -->
+        <footer class="mt-6 text-center text-xs text-slate-400 space-y-1">
+            <p>微風南山旗艦體驗館 · 揮汗加碼專案</p>
+        </footer>
     </main>
 
-    <div id="resultModal" class="fixed inset-0 modal-overlay z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <div class="ticket-cutout w-[85vw] max-w-sm p-8 text-center shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
-            <p class="text-[#39FF14] font-bold tracking-widest mb-2 text-sm uppercase">Congratulations</p>
-            <h3 class="text-2xl font-black mb-6 text-white">抽獎結果</h3>
+    <!-- 中獎兌換彈跳視窗 -->
+    <div id="resultModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+        <div id="modalContent" class="ticket-notch w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl transform scale-95 transition-transform duration-300 border border-emerald-500/40">
             
-            <div class="py-6 border-y border-dashed border-gray-700 my-4">
-                <p class="text-gray-400 text-sm mb-2">您獲得的獎項是</p>
-                <div id="prizeNameDisplay" class="text-3xl font-black text-[#39FF14] drop-shadow-[0_0_8px_rgba(57,255,20,0.6)] leading-tight">
-                    <!-- 獎品名稱 -->
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold mb-3 tracking-widest uppercase">
+                ★ Congratulations ★
+            </div>
+            
+            <h3 class="text-xl font-black text-white tracking-wide">
+                恭喜獲得運動應援禮
+            </h3>
+            
+            <!-- 獎項卡片 -->
+            <div class="my-5 py-6 px-3 bg-gradient-to-b from-slate-900/80 to-slate-950/90 rounded-2xl border border-slate-800 shadow-inner relative overflow-hidden">
+                <div class="absolute -right-8 -top-8 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
+                <div class="absolute -left-8 -bottom-8 w-24 h-24 bg-cyan-500/10 rounded-full blur-xl pointer-events-none"></div>
+
+                <p class="text-xs text-slate-400 font-medium tracking-wider mb-2">中獎品項</p>
+                <div id="prizeNameDisplay" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-300 to-white drop-shadow-[0_0_15px_rgba(0,255,135,0.4)] leading-tight py-1">
+                    <!-- 動態填入中獎名稱 -->
                 </div>
             </div>
 
-            <p class="text-sm text-gray-300 mt-6 mb-6">請向門市人員出示此畫面<br>以完成兌換</p>
+            <div class="space-y-1 text-xs text-slate-300 mb-6 bg-slate-900/40 p-3 rounded-xl border border-slate-800/80">
+                <p class="font-bold text-cyan-300 flex items-center justify-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    兌換憑證已生效
+                </p>
+                <p class="text-slate-400">請保持本畫面並交由門市夥伴完成核銷領取</p>
+            </div>
             
-            <button onclick="closeModal()" class="w-full border border-gray-500 text-gray-300 py-3 rounded hover:bg-gray-800 transition uppercase text-sm font-bold tracking-widest">
-                確認
+            <button 
+                onclick="closeModal()" 
+                class="w-full bg-slate-800 hover:bg-slate-700 active:bg-slate-900 border border-slate-600/80 text-white font-bold py-3.5 rounded-xl transition text-sm tracking-wider"
+            >
+                完成並出示店員
             </button>
         </div>
     </div>
 
+    <!-- 內建系統浮動通知 (完全取代原生 alert) -->
+    <div id="toastNotification" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 max-w-xs w-[90%] glass-panel border border-rose-500/40 bg-slate-900/95 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-4 pointer-events-none">
+        <div class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+        </div>
+        <p id="toastMessage" class="text-xs font-medium leading-tight text-slate-200"></p>
+    </div>
+
     <script>
         // ==========================================
-        // --- 抽獎系統設定 ---
+        // --- 核心系統設定 (與後端完全同步) ---
         // ==========================================
         const API_URL = "https://script.google.com/macros/s/AKfycbxgNbp_PGLZrWLiWrMqkpcn3savo_0mmO7zhZ_fI8qoQRG2LlSDg46IJ0AegnMM5eDkaw/exec";
         const isMockMode = API_URL.trim() === "";
 
-        // 將圖片上的獎項直接設定到前端，並搭配科技感配色
+        // ==========================================
+        // --- Tone.js 專屬科技音效引擎 (免外部音檔) ---
+        // ==========================================
+        let isAudioEnabled = true;
+        let audioInitialized = false;
+        let spinTickerTimer = null;
+
+        // 1. 轉盤指針機械刻度音 (Pluck/Tick)
+        const tickSynth = new Tone.MembraneSynth({
+            pitchDecay: 0.008,
+            octaves: 2,
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.001, decay: 0.04, sustain: 0, release: 0.04 }
+        }).toDestination();
+        tickSynth.volume.value = -6;
+
+        // 2. 啟動高科技充能音 (Charge-up sweep)
+        const chargeSynth = new Tone.Synth({
+            oscillator: { type: "triangle" },
+            envelope: { attack: 0.02, decay: 0.15, sustain: 0.1, release: 0.3 }
+        }).toDestination();
+        chargeSynth.volume.value = -10;
+
+        // 3. 中獎勝利慶典音效 (Poly Synth 和弦與琶音)
+        const celebrationSynth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: "triangle8" },
+            envelope: { attack: 0.02, decay: 0.3, sustain: 0.2, release: 1.2 }
+        }).toDestination();
+        celebrationSynth.volume.value = -4;
+
+        // 4. 警示提示音
+        const alertSynth = new Tone.Synth({
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.01, decay: 0.15, sustain: 0, release: 0.1 }
+        }).toDestination();
+        alertSynth.volume.value = -8;
+
+        // 確保手機瀏覽器在第一次使用者點擊時喚醒 AudioContext
+        async function ensureAudioReady() {
+            if (!audioInitialized && isAudioEnabled) {
+                try {
+                    await Tone.start();
+                    audioInitialized = true;
+                } catch (e) {
+                    console.warn("音訊初始化略過：", e);
+                }
+            }
+        }
+
+        // 音效開關切換
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const icon = document.getElementById('soundIcon');
+            icon.innerText = isAudioEnabled ? '🔊' : '🔇';
+            if (isAudioEnabled) {
+                ensureAudioReady();
+                playTickSound();
+            }
+        }
+
+        // 播放指針撥動卡嗒聲
+        function playTickSound() {
+            if (!isAudioEnabled) return;
+            try {
+                // 微調音高帶出擬真機械刻度感
+                const notes = ["C5", "D5", "G5", "E5"];
+                const randomNote = notes[Math.floor(Math.random() * notes.length)];
+                tickSynth.triggerAttackRelease(randomNote, "32n");
+            } catch (e) {}
+        }
+
+        // 模擬轉盤 5.4 秒漸層減速音效節奏
+        function playSpinDecelerationSounds(totalDurationMs = 5400) {
+            if (!isAudioEnabled) return;
+            if (spinTickerTimer) clearTimeout(spinTickerTimer);
+
+            const startTime = Date.now();
+            let interval = 55; // 初始高速旋轉 (55ms 敲擊一次)
+
+            function nextTick() {
+                const elapsed = Date.now() - startTime;
+                if (elapsed >= totalDurationMs - 200) return; // 動畫即將結束時停止
+
+                playTickSound();
+
+                // 依據旋轉時間動態拉長刻度間隔 (模擬自然減速)
+                const progress = elapsed / totalDurationMs;
+                if (progress < 0.4) {
+                    interval = 55 + (progress * 80); // 輕微加速到平穩
+                } else if (progress < 0.75) {
+                    interval = 90 + Math.pow((progress - 0.4) * 3, 2) * 120; // 逐漸拉長
+                } else {
+                    interval = 220 + Math.pow((progress - 0.75) * 4, 3) * 280; // 最後幾格沉穩倒數
+                }
+
+                spinTickerTimer = setTimeout(nextTick, interval);
+            }
+
+            nextTick();
+        }
+
+        // 播放中獎璀璨音效
+        function playWinningFanfare() {
+            if (!isAudioEnabled) return;
+            try {
+                const now = Tone.now();
+                // 1. 快速璀璨上升琶音 (Galaxy 運動能量感)
+                celebrationSynth.triggerAttackRelease("G4", "16n", now);
+                celebrationSynth.triggerAttackRelease("C5", "16n", now + 0.08);
+                celebrationSynth.triggerAttackRelease("E5", "16n", now + 0.16);
+                celebrationSynth.triggerAttackRelease("G5", "16n", now + 0.24);
+                celebrationSynth.triggerAttackRelease("C6", "8n", now + 0.32);
+
+                // 2. 宏亮大和弦結尾 (C Major Add9)
+                setTimeout(() => {
+                    if (isAudioEnabled) {
+                        celebrationSynth.triggerAttackRelease(["C4", "G4", "C5", "E5", "D6"], "1.5s");
+                    }
+                }, 450);
+            } catch (e) {}
+        }
+
+        // 播放錯誤/警示音
+        function playAlertSound() {
+            if (!isAudioEnabled) return;
+            try {
+                const now = Tone.now();
+                alertSynth.triggerAttackRelease("E4", "16n", now);
+                alertSynth.triggerAttackRelease("C4", "16n", now + 0.12);
+            } catch (e) {}
+        }
+
+        // 預設 7 個獎項與旗艦運動深邃漸層色彩
         let prizes = [
-            { id: 1, name: "環保收納盒", color: "#39FF14", textColor: "#000" },      // 螢光綠
-            { id: 2, name: "手機擦拭布", color: "#2189FF", textColor: "#FFF" },      // 三星藍
-            { id: 3, name: "AI帆布袋", color: "#FF4500", textColor: "#FFF" },        // 活力橘
-            { id: 4, name: "木製杯墊", color: "#9333EA", textColor: "#FFF" },        // 科技紫
-            { id: 5, name: "行動電源", color: "#EAB308", textColor: "#000" },        // 閃耀黃
-            { id: 6, name: "吸管跳跳杯", color: "#EC4899", textColor: "#FFF" },      // 桃粉色
-            { id: 7, name: "放鬆筋膜槍", color: "#111111", textColor: "#FFF" }         // 質感黑
+            { id: 1, name: "環保收納盒", color: "#00E676", gradColor: "#00B0FF", textColor: "#000000" },
+            { id: 2, name: "手機擦拭布", color: "#1E3A8A", gradColor: "#172554", textColor: "#FFFFFF" },
+            { id: 3, name: "AI帆布袋",   color: "#FF6D00", gradColor: "#DD2C00", textColor: "#FFFFFF" },
+            { id: 4, name: "木製杯墊",   color: "#1F2937", gradColor: "#111827", textColor: "#F3F4F6" },
+            { id: 5, name: "行動電源",   color: "#FFD600", gradColor: "#FFAB00", textColor: "#000000" },
+            { id: 6, name: "吸管跳跳杯", color: "#EC4899", gradColor: "#BE185D", textColor: "#FFFFFF" },
+            { id: 7, name: "放鬆筋膜槍", color: "#0F172A", gradColor: "#020617", textColor: "#00FF87" }
         ];
 
         let currentRotation = 0;
+        let isSpinning = false;
 
-        // --- 初始化與繪製轉盤 ---
+        // --- 訊息提示 (取代原生 alert) ---
+        function showNotification(msg) {
+            playAlertSound();
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.innerText = msg;
+            toast.classList.remove('opacity-0', '-translate-y-4', 'pointer-events-none');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-4', 'pointer-events-none');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 3200);
+        }
+
+        // --- 初始化應用 ---
         async function initApp() {
             if (!isMockMode) {
-                document.getElementById('demo-badge').style.display = 'none';
+                const demoBadge = document.getElementById('demo-badge');
+                if (demoBadge) demoBadge.style.display = 'none';
+                
                 try {
-                    // 嘗試從 GAS 取得目前最新的獎項設定
+                    // 從後端 GAS 獲取目前最新獎項庫存設定
                     const response = await fetch(API_URL);
                     const cloudPrizes = await response.json();
                     
-                    // 如果成功從雲端取回資料且不為空，才覆寫本地的預設獎項
-                    // 如果雲端抓取失敗或被阻擋，就會繼續使用上方設定的 7 個預設獎項
-                    if (cloudPrizes && cloudPrizes.length > 0) {
-                        prizes = cloudPrizes;
+                    if (cloudPrizes && Array.isArray(cloudPrizes) && cloudPrizes.length > 0) {
+                        prizes = cloudPrizes.map((p, idx) => {
+                            const fallback = prizes[idx % prizes.length];
+                            return {
+                                id: p.id || idx + 1,
+                                name: p.name,
+                                color: p.color || fallback.color,
+                                gradColor: fallback.gradColor || '#111827',
+                                textColor: p.textColor || fallback.textColor
+                            };
+                        });
                     }
                 } catch (e) {
-                    console.error("無法連線至資料庫，將使用前端預設獎項顯示", e);
+                    console.warn("使用本地精緻配色繪製轉盤：", e);
                 }
             }
-            drawWheel();
+            drawHighTechWheel();
         }
 
-        function drawWheel() {
+        // --- 繪製運動科技感轉盤 ---
+        function drawHighTechWheel() {
             const canvas = document.getElementById('wheelCanvas');
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
             
-            // 設定高解析度 Canvas，避免鋸齒
-            const size = canvas.parentElement.clientWidth;
-            canvas.width = size * 2;
-            canvas.height = size * 2;
+            // 視網膜高清晰度縮放 (Retina Display)
+            const parentWidth = canvas.parentElement.clientWidth;
+            const dpr = window.devicePixelRatio || 2;
+            canvas.width = parentWidth * dpr;
+            canvas.height = parentWidth * dpr;
             canvas.style.width = '100%';
             canvas.style.height = '100%';
             
             const radius = canvas.width / 2;
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
+            const centerX = radius;
+            const centerY = radius;
             
-            // 防護機制：萬一 prizes 為空，避免計算錯誤
             if (!prizes || prizes.length === 0) return;
-            
             const arcSize = (2 * Math.PI) / prizes.length;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -252,74 +664,138 @@
             for (let i = 0; i < prizes.length; i++) {
                 const angle = i * arcSize;
                 
-                // 畫扇形
+                // 1. 繪製扇形漸層
+                ctx.save();
                 ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
                 ctx.arc(centerX, centerY, radius, angle, angle + arcSize, false);
-                ctx.lineTo(centerX, centerY);
-                ctx.fillStyle = prizes[i].color || '#333'; // 確保有預設顏色
-                ctx.fill();
-                
-                // 畫邊界線
-                ctx.lineWidth = 4;
-                ctx.strokeStyle = "#111";
-                ctx.stroke();
+                ctx.closePath();
 
-                // 寫字
+                // 徑向金屬與微光漸層
+                const radGrad = ctx.createRadialGradient(
+                    centerX, centerY, radius * 0.2,
+                    centerX, centerY, radius
+                );
+                radGrad.addColorStop(0, prizes[i].color || '#1e293b');
+                radGrad.addColorStop(1, prizes[i].gradColor || '#0f172a');
+                
+                ctx.fillStyle = radGrad;
+                ctx.fill();
+
+                // 2. 扇形邊界光條
+                ctx.lineWidth = 3 * (dpr / 2);
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+                ctx.stroke();
+                ctx.restore();
+
+                // 3. 繪製精緻外圍 LED 點點
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle + arcSize / 2);
+
+                const dotDistance = radius - (14 * (dpr / 2));
+                ctx.beginPath();
+                ctx.arc(dotDistance, 0, 3 * (dpr / 2), 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+                ctx.shadowColor = "#00FF87";
+                ctx.shadowBlur = 6;
+                ctx.fill();
+                ctx.restore();
+
+                // 4. 文字排版
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle + arcSize / 2);
                 ctx.textAlign = "right";
                 ctx.textBaseline = "middle";
-                ctx.fillStyle = prizes[i].textColor || '#FFF';
-                ctx.font = "bold 40px 'Noto Sans TC'";
+                ctx.fillStyle = prizes[i].textColor || "#FFFFFF";
                 
-                if(ctx.fillStyle === "#FFF" || ctx.fillStyle === "#ffffff" || ctx.fillStyle === "rgb(255, 255, 255)") {
-                    ctx.shadowColor = "rgba(0,0,0,0.8)";
-                    ctx.shadowBlur = 5;
-                }
+                // 根據畫面動態適配文字尺寸
+                const fontSize = Math.max(22, Math.floor(26 * (dpr / 2)));
+                ctx.font = `900 ${fontSize}px 'Noto Sans TC', sans-serif`;
+                
+                // 陰影增加科技對比
+                ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
                 
                 let text = prizes[i].name || '';
-                if(text.length > 6) text = text.substring(0, 5) + '...';
+                if (text.length > 6) {
+                    text = text.substring(0, 5) + '..';
+                }
                 
-                ctx.fillText(text, radius - 40, 0);
+                // 文字位置保留邊距
+                const textMargin = 38 * (dpr / 2);
+                ctx.fillText(text, radius - textMargin, 0);
                 ctx.restore();
             }
+
+            // 5. 轉盤最外圈內陰影環
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius - (4 * (dpr / 2)), 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(0, 242, 254, 0.35)";
+            ctx.lineWidth = 4 * (dpr / 2);
+            ctx.stroke();
+            ctx.restore();
         }
 
+        // --- 視窗大小改變時重繪轉盤 ---
+        window.addEventListener('resize', () => {
+            if (!isSpinning) drawHighTechWheel();
+        });
+
+        // --- 啟動抽獎核心邏輯 ---
         async function startSpin() {
+            if (isSpinning) return;
+            await ensureAudioReady();
+
             const phoneInput = document.getElementById('phoneInput');
             const spinBtn = document.getElementById('spinBtn');
+            const spinBtnText = document.getElementById('spinBtnText');
             const phone = phoneInput.value.trim();
 
+            // 手機號碼格式防護 (09開頭10碼)
             if (!/^09\d{8}$/.test(phone)) {
-                alert('請輸入正確的 10 碼手機號碼 (09開頭)');
+                showNotification('請輸入正確的 10 碼手機號碼 (09開頭)');
+                phoneInput.focus();
                 return;
             }
 
+            // 播放啟動充能音
+            if (isAudioEnabled) {
+                chargeSynth.triggerAttackRelease("C4", "16n");
+                setTimeout(() => chargeSynth.triggerAttackRelease("G4", "8n"), 100);
+            }
+
+            // 鎖定 UI
+            isSpinning = true;
             phoneInput.disabled = true;
             spinBtn.disabled = true;
-            spinBtn.innerHTML = '<span class="animate-pulse">連線驗證中...</span>';
-            spinBtn.style.opacity = '0.7';
+            spinBtnText.innerText = '星動連線核驗中...';
 
             let resultPrizeName = "";
             let winningIndex = 0;
 
             if (isMockMode) {
-                await new Promise(r => setTimeout(r, 800));
+                // 模擬模式
+                await new Promise(r => setTimeout(r, 600));
                 winningIndex = Math.floor(Math.random() * prizes.length);
                 resultPrizeName = prizes[winningIndex].name;
             } else {
                 try {
+                    // 正式呼叫後端 Google Apps Script
                     const response = await fetch(API_URL, {
                         method: 'POST',
                         body: JSON.stringify({ phone: phone, action: 'draw' }),
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                     });
                     
                     const data = await response.json();
                     
-                    if(data.status === 'error') {
-                        alert(data.message || "發生錯誤，請洽門市人員。");
+                    if (data.status === 'error') {
+                        showNotification(data.message || '很抱歉，此門號無法參加抽獎');
                         resetUI();
                         return;
                     }
@@ -327,34 +803,44 @@
                     resultPrizeName = data.prize;
                     winningIndex = prizes.findIndex(p => p.name === resultPrizeName);
                     
-                    if(winningIndex === -1) winningIndex = 0; 
+                    // 若後端品項前端未建檔，安全回退到第一格
+                    if (winningIndex === -1) winningIndex = 0;
 
                 } catch (error) {
-                    console.error(error);
-                    alert('連線失敗，請確認網路狀態或洽門市人員。');
+                    console.error("後端連線異常：", error);
+                    showNotification('連線逾時，請確認門市網路狀態或洽工作人員');
                     resetUI();
                     return;
                 }
             }
 
-            spinBtn.innerHTML = '<span>抽獎進行中...</span>';
+            // 動態轉盤啟動
+            spinBtnText.innerText = '能量轉動中...';
             
             const canvas = document.getElementById('wheelCanvas');
             const arcSize = 360 / prizes.length;
             
-            const targetAngle = 270 - (winningIndex * arcSize) - (arcSize / 2); 
-            const extraSpins = 360 * (5 + Math.floor(Math.random() * 5)); 
+            // 指針位於上方 12 點鐘方向 (270度)
+            const targetAngle = 270 - (winningIndex * arcSize) - (arcSize / 2);
+            const extraSpins = 360 * (6 + Math.floor(Math.random() * 3)); // 額外轉 6-8 圈
             
             currentRotation = currentRotation + extraSpins + targetAngle - (currentRotation % 360);
-            
             canvas.style.transform = `rotate(${currentRotation}deg)`;
 
+            // 同步觸發物理減速棘輪音效
+            playSpinDecelerationSounds(5400);
+
+            // 等待旋轉動畫完成
             setTimeout(() => {
                 showResult(resultPrizeName);
-            }, 5200); 
+            }, 5500);
         }
 
+        // --- 顯示中獎視窗與彩花效果 ---
         function showResult(prizeName) {
+            // 播放勝利慶祝和弦與琶音
+            playWinningFanfare();
+
             document.getElementById('prizeNameDisplay').innerText = prizeName;
             const modal = document.getElementById('resultModal');
             const content = document.getElementById('modalContent');
@@ -363,22 +849,41 @@
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 content.classList.remove('scale-95');
-            }, 50);
+            }, 30);
 
-            document.getElementById('spinBtn').innerHTML = '<span>已完成抽獎</span>';
+            // 噴發勝利彩花 (Galaxy 科技配色：螢光綠、電光藍、暖橘)
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#00FF87', '#00F2FE', '#FF5722', '#FFFFFF']
+                });
+            }
+
+            document.getElementById('spinBtnText').innerText = '今日抽獎已完成';
         }
 
+        // --- 關閉彈窗 ---
         function closeModal() {
-            alert("請將此畫面交由門市人員核銷！");
+            showNotification('已記錄！請向門市人員出示此畫面兌換好禮。');
+            const modal = document.getElementById('resultModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
         }
 
+        // --- 重置 UI 狀態 ---
         function resetUI() {
+            isSpinning = false;
             const phoneInput = document.getElementById('phoneInput');
             const spinBtn = document.getElementById('spinBtn');
+            const spinBtnText = document.getElementById('spinBtnText');
+
             phoneInput.disabled = false;
             spinBtn.disabled = false;
-            spinBtn.style.opacity = '1';
-            spinBtn.innerHTML = '<span>啟動抽獎</span>';
+            spinBtnText.innerText = '啟動星動轉盤';
         }
     </script>
 </body>
